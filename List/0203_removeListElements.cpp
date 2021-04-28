@@ -15,7 +15,7 @@
  * };
  */
 
-// 直接使用原来的链表 
+// 直接使用原来的链表 O(n) O(1)
 class Solution1 {
 public:
     ListNode* removeElements(ListNode* head, int val) {
