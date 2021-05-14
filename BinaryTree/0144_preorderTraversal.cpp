@@ -57,3 +57,27 @@ public:
         return res;
     }
 };
+
+
+// 迭代第2种写法
+class Solution3 {  // 这个方法不好想出来
+public:
+    vector<int> preorderTraversal(TreeNode* root) {
+        stack<TreeNode*> st;  // 用栈实现迭代
+        vector<int> result;
+        st.push(root);  // 中  初始值
+        while (!st.empty()) {
+            TreeNode* node = st.top();  // 中
+            st.pop();
+            if (node != NULL) {
+                result.push_back(node->val);
+            }
+            else {
+                continue;
+            }
+            st.push(node->right);  // 右
+            st.push(node->left);  // 左
+        }
+        return result;
+    }
+};

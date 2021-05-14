@@ -34,7 +34,7 @@ public:
 
 
 // 迭代
-class Solution {
+class Solution2 {
 public:
     vector<int> postorderTraversal(TreeNode *root) {
         vector<int> res;
@@ -61,5 +61,30 @@ public:
             }
         }
         return res;
+    }
+};
+
+
+// 迭代第2种方法
+class Solution3 {  // 中左右 -> 中右左 -> 左右中
+public:
+    vector<int> postorderTraversal(TreeNode *root) {
+        vector<int> result;
+        stack<TreeNode*> st;
+        st.push(root);
+        while (!st.empty()) {
+            TreeNode* node = st.top();  // 中
+            st.pop();
+            if (node != NULL) {
+                result.push_back(node->val);
+            }
+            else {
+                continue;
+            }
+            st.push(node->left);  // 左 先进后出
+            st.push(node->right);  // 右
+        }
+        reverse(result.begin(), result.end());
+        return result;
     }
 };

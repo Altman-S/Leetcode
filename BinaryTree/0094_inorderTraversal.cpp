@@ -52,3 +52,27 @@ public:
         return res;
     }
 };
+
+
+// 迭代第2种方法
+class Solution3 {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> result;
+        stack<TreeNode*> st;
+        TreeNode* cur = root;
+        while(cur != NULL || !st.empty()) {
+            if (cur != NULL) {
+                st.push(cur);
+                cur = cur->left;  // 左
+            }
+            else {
+                cur = st.top();  // 中
+                st.pop();
+                result.push_back(cur->val);
+                cur = cur->right;  // 右
+            }
+        }
+        return result;
+    }
+};
