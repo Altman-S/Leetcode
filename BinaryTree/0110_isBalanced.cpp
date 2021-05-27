@@ -42,3 +42,44 @@ public:
 
 
 // 迭代
+class Solution2 {
+public:
+    int getDepth(TreeNode* node) {  //  迭代后序遍历，记录每个节点的深度
+        stack<TreeNode*> st;
+        if (node != NULL) st.push(node);
+        int depth = 0;  // 记录深度
+        int result = 0;
+        while (!st.empty()) {
+            TreeNode* node = st.top();
+            if (node != NULL) {
+                st.pop();
+                st.push(node);  // 中
+                st.push(NULL);
+                depth++;
+                if (node->right) st.push(node->right);  // 右
+                if (node->left) st.push(node->left);  // 左
+            }
+            else {
+                st.pop();
+                node = st.top();
+                st.pop();
+                depth--;
+            }
+            result = result > depth ? result : depth;
+        }
+        return result;
+    }
+    bool isBalanced(TreeNode* root) {
+        stack<TreeNode*> st;
+        if (root == NULL) return true;
+        st.push(root);
+        while (!st.empty()) {
+            TreeNode* node = st.top();  // 中
+            st.pop();
+            if (abs(getDepth(node->left) - getDepth(node->right)) > 1) return false;
+            if (node->right) st.push(node->right);  // 右
+            if (node->left) st.push(node->left);  // 左
+        }
+        return true;
+    }
+};
