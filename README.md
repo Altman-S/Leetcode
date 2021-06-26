@@ -146,3 +146,5 @@ map作为哈希表
 + map是一种<key, value>的结构，可以用key保存数值，用value在保存数值所在的下标。
 + 虽然map是万能的，但也要知道什么时候用数组，什么时候用set。
 
+## [二叉树](https://mp.weixin.qq.com/s/_ymfWYvTNd2GvWvC5HOE4A)
+
