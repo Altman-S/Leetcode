@@ -146,5 +146,228 @@ map作为哈希表
 + map是一种<key, value>的结构，可以用key保存数值，用value在保存数值所在的下标。
 + 虽然map是万能的，但也要知道什么时候用数组，什么时候用set。
 
+
 ## [二叉树](https://mp.weixin.qq.com/s/_ymfWYvTNd2GvWvC5HOE4A)
+
+### 基础概念
+
++ 二叉树的种类：满二叉树、完全二叉树、二叉搜索树、平衡二叉搜索树
++ 二叉树的遍历方式：
+  - 深度优先遍历
+     * 前序遍历（递归法、迭代法）
+     * 中序遍历（递归法、迭代法）
+     * 后序遍历（递归法、迭代法）
+  - 广度优先遍历
+     * 层序遍历（迭代法）
++ 二叉树的定义：
+
+```js
+// 二叉树节点
+struct TreeNode {
+    int val;  // 节点存储的元素
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+}
+```
+
+### 二叉树遍历代码
+
+1.二叉树的递归遍历（以前序为例）
+
++ **确定递归函数的参数和返回值：**因为要打印出前序遍历节点的数值，所以参数⾥需要传⼊vector在 放节点的数值，除了这⼀点就不需要在处理什么数据了也不需要有返回值，所以递归函数返回类型就是void，代码如下：
+
+```js
+void traversal(TreeNode *cur, vector<int> vec)
+```
+
++ **确定终⽌条件：**在递归的过程中，如何算是递归结束了呢，当然是当前遍历的节点是空了，那么本层递归就要要结束了，所以如果当前遍历的这个节点是空，就直接return，代码如下：
+
+```js
+if (cur == nullptr) return;
+```
+
++ **确定单层递归的逻辑：**前序遍历是中左右的循序，所以在单层递归的逻辑，是要先取中节点的数值，代码如下：
+
+```js
+vec.push_back(cur->val);    // 中 
+traversal(cur->left, vec);  // 左 
+traversal(cur->right, vec); // 右
+```
+
++ 完整代码：
+
+```js
+class Solution { 
+public:
+    void traversal(TreeNode* cur, vector<int>& vec) { 
+        if (cur == NULL) return; 
+        vec.push_back(cur->val);    // 中 
+        traversal(cur->left, vec);  // 左 
+        traversal(cur->right, vec); // 右 
+    } 
+vector<int> preorderTraversal(TreeNode* root) { 
+    vector<int> result; 
+    traversal(root, result); 
+    return result; 
+    }
+};
+```
+
+2.二叉树的迭代遍历（利用stack）
+
+递归的实现就是：**每⼀次递归调⽤都会把函数的局部变量、参数值和返回地址等压⼊调⽤栈中**，然后递归返回的时候，从栈顶弹出上⼀次递归的各项参数，所以这就是递归为什么可以返回上⼀层位置的原因。
+
++ 前序迭代遍历（中左右）
+前序遍历是中左右，每次先处理的是中间节点，**那么先将跟节点放⼊栈中，然后将右孩⼦加⼊栈，再加⼊左孩⼦**。为什么要先加⼊右孩⼦，再加⼊左孩⼦呢？因为这样出栈的时候才是中左右的顺序。
+
+```js
+class Solution { 
+public:
+    vector<int> preorderTraversal(TreeNode* root) { 
+        stack<TreeNode*> st; 
+        vector<int> result; 
+        if (root == NULL) return result; 
+        st.push(root); 
+        while (!st.empty()) {
+            TreeNode* node = st.top();
+            st.pop(); 
+            result.push_back(node->val);           // 中
+            if (node->right) st.push(node->right); // 右（空节点不⼊栈）
+            if (node->left) st.push(node->left);   // 左（空节点不⼊栈）
+       } 
+       return result;
+    }
+};
+```
+
++ 中序迭代遍历（左中右）
+**访问的元素和要处理的元素顺序是不⼀致的，那么在使⽤迭代法写中序遍历，就需要借⽤指针的遍历来帮助访问节点，栈则⽤来处理节点上的元素。**
+
+```js
+class Solution { 
+public:
+    vector<int> inorderTraversal(TreeNode* root) { 
+        vector<int> result; 
+        stack<TreeNode*> st;
+        TreeNode* cur = root;
+        while (cur != NULL || !st.empty()) {
+            if (cur != NULL) { // 指针来访问节点，访问到最底层
+                st.push(cur); // 将访问的节点放进栈 
+                cur = cur->left;            // 左 
+            } else { 
+                cur = st.top(); // 从栈⾥弹出的数据，就是要处理的数据（放进result数组⾥的数据）
+                st.pop(); 
+                result.push_back(cur->val); // 中
+                cur = cur->right;           // 右
+            }
+        } 
+        return result;
+    }
+};
+```
+
++ 后序迭代遍历（左右中）
+
+![image text](https://raw.githubusercontent.com/Altman-S/myImageFolder/main/DataStructure/houxu.png)
+
+所以后序遍历只需要**前序遍历的代码稍作修改**就可以了，代码如下：
+
+```js
+class Solution { 
+public:
+    vector<int> postorderTraversal(TreeNode* root) { 
+        stack<TreeNode*> st; 
+        vector<int> result; 
+        if (root == NULL) return result; 
+        st.push(root); 
+        while (!st.empty()) {
+            TreeNode* node = st.top();             // 中
+            st.pop(); 
+            result.push_back(node->val); 
+            if (node->left) st.push(node->left);   // 左
+            if (node->right) st.push(node->right); // 右
+        }
+        reverse(result.begin(), result.end()); // 中右左->左中右
+        return result;
+    }
+};
+```
+
++ 二叉树的统一迭代法（以中序为例）
+
+那我们就将访问的节点放⼊栈中，**把要处理的节点也放⼊栈中但是要做标记**。如何标记呢，就是要处理的节点放⼊栈之后，紧接着放⼊⼀个空指针作为标记。这种⽅法也可以叫做标记法。
+
+```js
+class Solution { 
+public:
+    vector<int> inorderTraversal(TreeNode* root) { 
+        vector<int> result; 
+        stack<TreeNode*> st; 
+        if (root != NULL) st.push(root); 
+        while (!st.empty()) {
+            TreeNode* node = st.top();
+            if (node != NULL) {
+                st.pop(); // 将该节点弹出，避免重复操作，下⾯再将右中左节点添加到栈中 
+                if (node->right) st.push(node->right); // 右
+                st.push(node);                         // 中 
+                st.push(NULL); // 中节点访问过，但是还没有处理，加⼊空节点做为标记。
+                if (node->left) st.push(node->left);   // 左
+            } else { // 只有遇到空节点的时候，才将下⼀个节点放进结果集
+                st.pop(); // 将空节点弹出 
+                node = st.top(); // 重新取出栈中元素 
+                st.pop(); 
+                result.push_back(node->val); // 加⼊到结果集 
+            }
+        } 
+        return result;
+    }
+};
+```
+
+3.二叉树的层序遍历
+
+⼆叉树层序遍历的模板如下所示：
+
+```js
+class Solution { 
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) { 
+        queue<TreeNode*> que; 
+        if (root != NULL) que.push(root); 
+        vector<vector<int>> result; 
+        while (!que.empty()) { 
+            int size = que.size(); 
+            vector<int> vec; // 使⽤固定⼤⼩size，不要使⽤que.size()，因为que.size是不断变化的
+            for (int i = 0; i < size; i++) {
+                TreeNode* node = que.front(); 
+                que.pop(); 
+                vec.push_back(node->val); 
+                if (node->left) que.push(node->left); 
+                if (node->right) que.push(node->right);
+            } 
+            result.push_back(vec);
+        }
+        return result;
+    }
+};
+```
+
+4.总结
+
+```js
+二叉树递归遍历、迭代遍历和层序遍历是二叉树题目的基础，一定要重点掌握！！！
+```
+
+### 二叉树经典题目
+
+![image text](https://raw.githubusercontent.com/Altman-S/myImageFolder/main/DataStructure/binarytree.png)
+
+
+
+
+
+
+
+
 
